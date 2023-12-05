@@ -5,9 +5,11 @@
 #include <SPIFFS.h>
 #include <Arduino_JSON.h>
 
-const char* ssid = "Nguyen Phu Cau";
-const char* password = "0904868337";
+// const char* ssid = "Nguyen Phu Cau";
+// const char* password = "0904868337";
 
+const char* ssid = "Mobile Robot ESP32";
+const char* password = "88888888";
 AsyncWebServer server(80);
 
 const char* Param_Input_1 = "input1";
@@ -62,18 +64,26 @@ void writeFile(fs::FS &fs, const char * path, const char * message) {
   }
 }
 
+// void initWiFi() {
+//   WiFi.mode(WIFI_STA);
+//   WiFi.begin(ssid, password);
+//   Serial.println("Conneting to WiFi " + String(ssid));
+//   while (WiFi.status() != WL_CONNECTED)
+//   {
+//     Serial.print(".");
+//     delay(500);
+//   }
+//   Serial.println("");
+//   Serial.print("Connected successed with IP: ");
+//   Serial.println(WiFi.localIP());
+// }
+
 void initWiFi() {
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  Serial.println("Conneting to WiFi " + String(ssid));
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    Serial.print(".");
-    delay(500);
-  }
-  Serial.println("");
-  Serial.print("Connected successed with IP: ");
-  Serial.println(WiFi.localIP());
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP(ssid, password);
+  Serial.println("Setting Access Point");
+  Serial.print("IP: ");
+  Serial.println(WiFi.softAPIP());
 }
 
 String getCurrentInputValue() {
