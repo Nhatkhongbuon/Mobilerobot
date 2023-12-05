@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>MOBILE ROBOT GROUP 1</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <script src="https://kit.fontawesome.com/1780777441.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div class="topnav">
+            <h1>MOBILE ROBOT GROUP 1</h1>
+        </div>
+
+        <div class="content">
+            <div class="card-grid">
+                <div class="card">
+                    <form action="/" method="POST">
+                        <p class="card-title">X Field</p>
+                        <p>
+                            <label for="input1">INPUT1</label>
+                            <input type="text" id="input1" name="input1">
+                            <input type="submit" value="Submit">
+                        </p>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <form action="/" method="POST">
+                        <p class="card-title">Y Field</p>
+                        <p>
+                            <label for="input2">INPUT2</label>
+                            <input type="text" id="input2" name="input2">
+                            <input type="submit" value="Submit">
+                        </p>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <p class="card-title">X Value</p>
+                    <p class="value">Current value: <span id="textFieldValue"></span></p>
+                </div>
+
+                <div class="card">
+                    <p class="card-title">Y Value</p>
+                    <p class="value">Current value: <span id="numberFieldValue"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+</html>
