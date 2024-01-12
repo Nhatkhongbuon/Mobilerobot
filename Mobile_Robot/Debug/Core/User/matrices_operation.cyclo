@@ -1,0 +1,12 @@
+../Core/User/matrices_operation.c:4:6:allocate_matrix	2
+../Core/User/matrices_operation.c:15:6:deallocate_matrix	2
+../Core/User/matrices_operation.c:24:6:reallocate_matrix	1
+../Core/User/matrices_operation.c:32:6:addition	5
+../Core/User/matrices_operation.c:48:6:subtraction	5
+../Core/User/matrices_operation.c:64:6:scalar_multiplication	3
+../Core/User/matrices_operation.c:75:6:mutiplication	5
+../Core/User/matrices_operation.c:95:6:transpose	3
+../Core/User/matrices_operation.c:107:6:minor	5
+../Core/User/matrices_operation.c:137:8:determinant	7
+../Core/User/matrices_operation.c:165:6:adjoint	4
+../Core/User/matrices_operation.c:181:6:inverse	1
