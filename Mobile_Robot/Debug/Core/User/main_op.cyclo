@@ -3,5 +3,5 @@
 ../Core/User/main_op.c:51:6:control_signal	1
 ../Core/User/main_op.c:69:6:next_state	1
 ../Core/User/main_op.c:92:6:torque	1
-../Core/User/main_op.c:229:6:velocity	1
-../Core/User/main_op.c:236:6:voltage	1
+../Core/User/main_op.c:230:6:velocity	1
+../Core/User/main_op.c:237:6:voltage	1

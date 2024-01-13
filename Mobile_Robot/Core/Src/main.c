@@ -45,6 +45,8 @@ TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim4;
 
+UART_HandleTypeDef huart2;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -55,6 +57,7 @@ static void MX_GPIO_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM4_Init(void);
+static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -75,8 +78,8 @@ static void MX_TIM4_Init(void);
 	double sample_time = 100;
 	double rate = 10; // = 1000/sample_time
 
-	uint16_t duty_cycle1 = 0; // for motor left
-	uint16_t duty_cycle2 = 0; // for motor right duty + 140 = duty 1 (v1 = v2)
+	unsigned int duty_cycle1 = 0; // for motor left
+	unsigned int  duty_cycle2 = 0; // for motor right duty + 140 = duty 1 (v1 = v2)
 
 	//robot variable
 	double sampling_interval = 0.1;
@@ -98,10 +101,11 @@ static void MX_TIM4_Init(void);
 	double theta = 1.57; // sample
 	double theta_r  = 0; //sample
 	double e_x, e_y, e_theta;
-	double v_r = 1; // sample
-	double w_r = 1; // sample
+	double v_r = 0.1; // sample
+	double w_r = 0.1; // sample
 	double w_r, v_r;
 	double k_4 = 1; // sample
+
 	matrix K_4;
 	matrix K;
 	matrix u;
@@ -113,15 +117,26 @@ static void MX_TIM4_Init(void);
 	double voltage_left = 0;
 	double voltage_right = 0;
 
+	//Testing
+	double time_start = 0;
+	double time_end = 0;
+	double time_interval = 0;
+
 	void pulse_modulation() {
 		__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 500);
 		__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 640);
 	}
+//	void pulse_modulation(int duty_cycle1, int duty_cycle2) {
+//		duty_cycle2 += 50;
+//		__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, duty_cycle1);
+//		__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, duty_cycle2);
+//	}
 
-
-	void convert_v_to_pwm() {
-
-	}
+//
+//	void convert_v_to_pwm(int duty_cycle1, int duty_cycle2) {
+//		duty_cycle1 = (int)(voltage_left / 6 * 10000);
+//		duty_cycle2 = (int)(voltage_right / 6 * 10000);
+//	}
 
 
 /* USER CODE END 0 */
@@ -147,7 +162,10 @@ int main(void)
 	allocate_matrix(&tau, 2, 1);
 	allocate_matrix(&v_c, 2, 1);
 	allocate_matrix(&v_c_old, 2, 1);
-			/* USER CODE END 1 */
+
+
+
+  /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -170,6 +188,7 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM4_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
   // Motor left
@@ -198,17 +217,17 @@ int main(void)
 
 	  if(HAL_GetTick() - present_time > sample_time) {
 		  	if(encoder_cnt1 - encoder1_previous < 0) {
-		  		w_right = ((encoder_cnt1 - encoder1_previous + 65535) / 1320) * rate;
+		  		w_right = ((encoder_cnt1 - encoder1_previous + 65535) / 1320) * rate * 6.28;
 		  	}
 		  	else {
-		  		w_right = ((encoder_cnt1 - encoder1_previous) / 1320) * rate;
+		  		w_right = ((encoder_cnt1 - encoder1_previous) / 1320) * rate * 6.28;
 		  	}
 
 		  	if(encoder_cnt2 - encoder2_previous < 0) {
-		  		w_left = ((encoder_cnt2 - encoder2_previous + 65535) / 1320) * rate;
+		  		w_left = ((encoder_cnt2 - encoder2_previous + 65535) / 1320) * rate * 6.28;
 		  	}
 		  	else {
-		  		w_left = ((encoder_cnt2 - encoder2_previous) / 1320) * rate;
+		  		w_left = ((encoder_cnt2 - encoder2_previous) / 1320) * rate * 6.28;
 		  	}
 
 	  		encoder1_previous = encoder_cnt1;
@@ -223,10 +242,13 @@ int main(void)
 	  		voltage(&voltage_left, &voltage_right, w_left, w_right, &tau);
 	  		next_state(&v, &x, &y, &theta, &x_r, &y_r, &theta_r, w_r, v_r);
 
-	  		convert_v_to_pwm();
-	  		pulse_modulation();
+
+//	  		convert_v_to_pwm(duty_cycle1, duty_cycle1);
+	  		pulse_modulation(duty_cycle1, duty_cycle2);
 	  		present_time = HAL_GetTick();
 	  	}
+
+
 
 
 
@@ -434,6 +456,39 @@ static void MX_TIM4_Init(void)
 
   /* USER CODE END TIM4_Init 2 */
   HAL_TIM_MspPostInit(&htim4);
+
+}
+
+/**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
 
 }
 

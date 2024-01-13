@@ -169,8 +169,8 @@ void torque(double theta, matrix *v, matrix *u, matrix *tau)
     allocate_matrix(&torque_1,2,1);
     mutiplication(&S_t_B_inv, &tu_1, &torque_1);
 
-// done matrix S_t_B_inv, tu_1;
-    deallocate_matrix(&S_t_B_inv);
+// done tu_1;
+
     deallocate_matrix(&tu_1);
 
     matrix M_deri_S;
@@ -223,6 +223,7 @@ void torque(double theta, matrix *v, matrix *u, matrix *tau)
     deallocate_matrix(&torque_2);
 
     *tau = torque_1;
+    deallocate_matrix(&torque_1);
 }
 
 // Calculate the linear velocity and angular velocity of the vehicle
