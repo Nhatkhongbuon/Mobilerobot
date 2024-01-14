@@ -9,4 +9,4 @@
 ../Core/User/matrices_operation.c:107:6:minor	5
 ../Core/User/matrices_operation.c:137:8:determinant	7
 ../Core/User/matrices_operation.c:165:6:adjoint	4
-../Core/User/matrices_operation.c:181:6:inverse	1
+../Core/User/matrices_operation.c:184:6:inverse	1

@@ -164,18 +164,21 @@ double determinant(matrix *A, unsigned_int8 expand_row)
 //Calculate adjoint matrix
 void adjoint(matrix *A, matrix *Ans)
 {
-    allocate_matrix(Ans, A->num_rows, A->num_columns);
-    for (int i = 0; i < Ans->num_rows; i++){
-        for (int j = 0; j < Ans->num_columns; j++){
+    matrix temp;
+    allocate_matrix(&temp, A->num_rows, A->num_columns);
+    for (int i = 0; i < temp.num_rows; i++){
+        for (int j = 0; j < temp.num_columns; j++){
             matrix M;
             minor(A, &M, i, j);
 
-            Ans->index[i][j] = ((i + j) % 2 == 0) ? (determinant(&M, 0)) : ((-1) * determinant(&M, 0));
+            temp.index[i][j] = ((i + j) % 2 == 0) ? (determinant(&M, 0)) : ((-1) * determinant(&M, 0));
             
             //Deallocate minor matrix
             deallocate_matrix(&M);
         }
     }
+    transpose(&temp, Ans);
+    deallocate_matrix(&temp);
 }
 
 void inverse(matrix *A, matrix *inverse_of_A)

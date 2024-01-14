@@ -33,4 +33,5 @@ void adjoint(matrix *A, matrix *Ans);
 double determinant(matrix *A, unsigned_int8 expand_row);
 void minor(matrix *major, matrix *minor, unsigned_int8 skip_row, unsigned_int8 skip_column);
 
+
 #endif /* USER_MATRICES_OP2_H_ */

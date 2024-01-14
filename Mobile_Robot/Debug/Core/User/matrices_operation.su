@@ -8,5 +8,5 @@
 ../Core/User/matrices_operation.c:95:6:transpose	24	static
 ../Core/User/matrices_operation.c:107:6:minor	40	static
 ../Core/User/matrices_operation.c:137:8:determinant	56	static
-../Core/User/matrices_operation.c:165:6:adjoint	40	static
-../Core/User/matrices_operation.c:181:6:inverse	24	static
+../Core/User/matrices_operation.c:165:6:adjoint	48	static
+../Core/User/matrices_operation.c:184:6:inverse	24	static

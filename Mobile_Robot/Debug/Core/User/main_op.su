@@ -1,7 +1,7 @@
 ../Core/User/main_op.c:29:6:error	48	static
 ../Core/User/main_op.c:38:6:virtual_control	40	static
 ../Core/User/main_op.c:51:6:control_signal	56	static
-../Core/User/main_op.c:69:6:next_state	80	static
-../Core/User/main_op.c:92:6:torque	232	static
-../Core/User/main_op.c:230:6:velocity	40	static
-../Core/User/main_op.c:237:6:voltage	32	static
+../Core/User/main_op.c:68:6:next_state	80	static
+../Core/User/main_op.c:91:6:torque	112	static
+../Core/User/main_op.c:137:6:velocity	40	static
+../Core/User/main_op.c:144:6:voltage	32	static
