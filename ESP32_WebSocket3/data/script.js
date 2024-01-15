@@ -8,6 +8,9 @@ function getValues() {
             console.log(myObj);
             document.getElementById("textFieldValue").innerHTML = myObj.textValue;
             document.getElementById("numberFieldValue").innerHTML = myObj.numberValue;
+            document.getElementById("thetaFieldValue").innerHTML = myObj.thetaValue;
+            document.getElementById("xrFieldValue").innerHTML = myObj.xrValue;
+            document.getElementById("yrFieldValue").innerHTML = myObj.yrValue;
         }
     };
 

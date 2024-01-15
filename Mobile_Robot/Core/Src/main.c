@@ -23,6 +23,9 @@
 /* USER CODE BEGIN Includes */
 #include "matrices_op2.h"
 #include <main_operation2.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,6 +48,8 @@ TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim4;
 
+UART_HandleTypeDef huart2;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -55,23 +60,28 @@ static void MX_GPIO_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM4_Init(void);
+static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+	char buffer[10];
+	double theta_buffer;
+
 	double x = 0;
 	double y = 0;
 	double theta = 0;
 	double left_angular_velocity = 0;
 	double right_angular_velocity = 0;
 
-	double x_r = 1;
-	double y_r = 1;
+	double x_r = 0;
+	double y_r = 0;
 	double theta_r = 0;
-	double v_r = 0.1;
-	double w_r = 0.1;
+	double v_r = 0.5;
+	double w_r = 0.5;
 
 	double e_x;
 	double e_y;
@@ -119,14 +129,9 @@ static void MX_TIM4_Init(void);
 
 
 	void convert_v_to_pwm(uint16_t *duty_cycle1, uint16_t *duty_cycle2, double voltage_left, double voltage_right) {
-		*duty_cycle1 = (int)((voltage_left / 12) * 600);
-		*duty_cycle2 = (int)((voltage_right / 12) * 600);
+		*duty_cycle1 = (int)((voltage_left / 12) * 1000);
+		*duty_cycle2 = (int)((voltage_right / 12) * 1000);
 	}
-
-	void pulse_modulation_test() {
-			__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 200); // left
-			__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 600); // right
-		}
 
 /* USER CODE END 0 */
 
@@ -190,7 +195,38 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM4_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+
+  HAL_UART_Receive(&huart2, &buffer, 8, 30000);
+
+  switch (buffer[4])
+  {
+  case 49:
+  	  x = buffer[0] - 48;
+  	  y = buffer[1] - 48;
+  	  theta = 0;
+  	  x_r = buffer[3] - 48;
+  	  y_r = buffer[4] - 48;
+  	  break;
+
+    	  case 48:
+  		x = buffer[0] - 48;
+  		y = buffer[1] - 48;
+  		theta = 0;
+  		x_r = buffer[3] - 48;
+  		y_r = buffer[4] - 48;
+  		break;
+
+    	  default:
+    		theta_buffer = ((buffer[2] - 48)*100) + ((buffer[4] - 48)*10) + (buffer[5] - 48);
+    		x = buffer[0] - 48;
+    		y = buffer[1] - 48;
+    		theta = theta_buffer / 100;
+    		x_r = buffer[6] - 48;
+    		y_r = buffer[7] - 48;
+    		break;
+  }
 
   // Motor left
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
@@ -457,6 +493,39 @@ static void MX_TIM4_Init(void)
 
   /* USER CODE END TIM4_Init 2 */
   HAL_TIM_MspPostInit(&htim4);
+
+}
+
+/**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
 
 }
 
