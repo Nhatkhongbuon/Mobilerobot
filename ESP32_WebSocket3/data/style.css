@@ -26,8 +26,17 @@ body {
     padding: 5%;
 }
 
-.card-grid {
-    max-width: 500px;
+.card-grid1 {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.card-grid2 {
+    padding: 5%;
+    max-width: 1000px;
     margin: 0 auto;
     display: grid;
     grid-gap: 2rem;
