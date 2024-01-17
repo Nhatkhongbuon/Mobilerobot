@@ -43,10 +43,19 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
+.card-grid3 {
+    padding: 5%;
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
 .card {
     background-color: white;
     box-shadow: 2px 2px 12px 1px rgba(140, 140, 140, .5);
 }
+
 
 .card-title {
     font-size: 1.2rem;
@@ -70,6 +79,7 @@ input[type=submit] {
     border-radius: 4px;
     transition-duration: .4s;
 }
+
 
 input[type=submit]:hover {
     background-color: darkslategray;

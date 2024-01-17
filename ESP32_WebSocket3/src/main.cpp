@@ -5,9 +5,11 @@
 #include <SPIFFS.h>
 #include <Arduino_JSON.h>
 #include <HardwareSerial.h>
+#include "soc/soc.h"
+#include "soc/rtc_cntl_reg.h"
 
-// const char* ssid = "Nguyen Phu Cau";
-// const char* password = "0904868337";
+const char* ssid_sta = "Nguyen Phu Cau";
+const char* password_sta = "0904868337";
 
 const char* ssid = "Mobile Robot ESP32";
 const char* password = "88888888";
@@ -78,8 +80,8 @@ void writeFile(fs::FS &fs, const char * path, const char * message) {
 
 // void initWiFi() {
 //   WiFi.mode(WIFI_STA);
-//   WiFi.begin(ssid, password);
-//   Serial.println("Conneting to WiFi " + String(ssid));
+//   WiFi.begin(ssid_sta, password_sta);
+//   Serial.println("Conneting to WiFi " + String(ssid_sta));
 //   while (WiFi.status() != WL_CONNECTED)
 //   {
 //     Serial.print(".");
@@ -88,6 +90,7 @@ void writeFile(fs::FS &fs, const char * path, const char * message) {
 //   Serial.println("");
 //   Serial.print("Connected successed with IP: ");
 //   Serial.println(WiFi.localIP());
+//   digitalWrite(19, HIGH);
 // }
 
 void initWiFi() {
@@ -96,6 +99,7 @@ void initWiFi() {
   Serial.println("Setting Access Point");
   Serial.print("IP: ");
   Serial.println(WiFi.softAPIP());
+  digitalWrite(18, HIGH);
 }
 
 String getCurrentInputValue() {
@@ -109,9 +113,12 @@ String getCurrentInputValue() {
 }
 
 void setup() {
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
   HardwareSerial SerialPort(2);
   Serial2.begin(115200, SERIAL_8N1, 16, 17); 
   Serial.begin(115200);
+  pinMode(18, OUTPUT);
+  pinMode(19, OUTPUT);
   initWiFi();
   initSPIFFS();
 
@@ -152,9 +159,7 @@ void setup() {
           Serial.println(input1);
           Serial.print("Buffer 0: ");
           Serial.println(buffer[0]);
-          for(int i=0; i<5; i++) {
-            Serial2.print(buffer[i]);
-          }
+        
           writeFile(SPIFFS, input1Path, input1.c_str());
         }
 
@@ -165,9 +170,7 @@ void setup() {
           Serial.println(input2);
           Serial.print("Buffer 1: ");
           Serial.println(buffer[1]);
-          for(int i=0; i<5; i++) {
-            Serial2.print(buffer[i]);
-          }
+          
           writeFile(SPIFFS, input2Path, input2.c_str());
         }
 
@@ -178,9 +181,7 @@ void setup() {
           Serial.println(input3);
           Serial.print("Buffer 2: ");
           Serial.println(buffer[2]);
-          for(int i=0; i<5; i++) {
-            Serial2.print(buffer[i]);
-          }
+          
           writeFile(SPIFFS, input3Path, input3.c_str());
         }
 
@@ -191,9 +192,7 @@ void setup() {
           Serial.println(input4);
           Serial.print("Buffer 3: ");
           Serial.println(buffer[3]);
-          for(int i=0; i<5; i++) {
-            Serial2.print(buffer[i]);
-          }
+          
           writeFile(SPIFFS, input4Path, input4.c_str());
         }
 
