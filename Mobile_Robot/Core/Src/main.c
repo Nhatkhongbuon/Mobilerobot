@@ -68,7 +68,7 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-	char buffer[10];
+	char buffer[8];
 	double theta_buffer;
 
 	double x = 0;
@@ -198,35 +198,15 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  HAL_UART_Receive(&huart2, &buffer, 8, 30000);
+  HAL_UART_Receive(&huart2, &buffer, 8, 90000);
 
-  switch (buffer[4])
-  {
-  case 49:
-  	  x = buffer[0] - 48;
-  	  y = buffer[1] - 48;
-  	  theta = 0;
-  	  x_r = buffer[3] - 48;
-  	  y_r = buffer[4] - 48;
-  	  break;
-
-    	  case 48:
-  		x = buffer[0] - 48;
-  		y = buffer[1] - 48;
-  		theta = 0;
-  		x_r = buffer[3] - 48;
-  		y_r = buffer[4] - 48;
-  		break;
-
-    	  default:
     		theta_buffer = ((buffer[2] - 48)*100) + ((buffer[4] - 48)*10) + (buffer[5] - 48);
     		x = buffer[0] - 48;
     		y = buffer[1] - 48;
     		theta = theta_buffer / 100;
     		x_r = buffer[6] - 48;
     		y_r = buffer[7] - 48;
-    		break;
-  }
+
 
   // Motor left
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
