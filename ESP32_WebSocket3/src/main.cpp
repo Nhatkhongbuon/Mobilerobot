@@ -8,8 +8,8 @@
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
 
-const char* ssid_sta = "Nguyen Phu Cau";
-const char* password_sta = "0904868337";
+const char* ssid_sta = "Nhatkhongbuon";
+const char* password_sta = "88888889";
 
 const char* ssid = "Mobile Robot ESP32";
 const char* password = "88888888";
@@ -81,15 +81,15 @@ void writeFile(fs::FS &fs, const char * path, const char * message) {
 // void initWiFi() {
 //   WiFi.mode(WIFI_STA);
 //   WiFi.begin(ssid_sta, password_sta);
-//   Serial.println("Conneting to WiFi " + String(ssid_sta));
-//   while (WiFi.status() != WL_CONNECTED)
-//   {
-//     Serial.print(".");
-//     delay(500);
-//   }
-//   Serial.println("");
-//   Serial.print("Connected successed with IP: ");
-//   Serial.println(WiFi.localIP());
+//   // Serial.println("Conneting to WiFi " + String(ssid_sta));
+//   // while (WiFi.status() != WL_CONNECTED)
+//   // {
+//   //   Serial.print(".");
+//   //   delay(500);
+//   // }
+//   // Serial.println("");
+//   // Serial.print("Connected successed with IP: ");
+//   // Serial.println(WiFi.localIP());
 //   digitalWrite(19, HIGH);
 // }
 
