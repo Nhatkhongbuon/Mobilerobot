@@ -48,8 +48,6 @@ TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim4;
 
-UART_HandleTypeDef huart2;
-
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -60,16 +58,12 @@ static void MX_GPIO_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM4_Init(void);
-static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-	char buffer[8];
-	double theta_buffer;
 
 	double x = 0;
 	double y = 0;
@@ -80,8 +74,8 @@ static void MX_USART2_UART_Init(void);
 	double x_r = 0;
 	double y_r = 0;
 	double theta_r = 0;
-	double v_r = 0.5;
-	double w_r = 0.5;
+	double v_r = 1;
+	double w_r = 1;
 
 	double e_x;
 	double e_y;
@@ -93,34 +87,37 @@ static void MX_USART2_UART_Init(void);
 	volatile double encoder_cnt1 = 0;
 	volatile double encoder_cnt2 = 0;
 
+	// test
+	double t1 = 0;
+	double t2 = 0;
+	double encoder_test_1 = 0;
+	double encoder_test_2 = 0;
+
 	volatile double encoder1_previous = 0;
 	volatile double encoder2_previous = 0;
 
 	double present_time = 0;
-	double sample_time = 100;
-	double rate = 10 * 6.28; // = 1000/sample_time
+	double sample_time = 1000;
+	double rate = 1 * 6.28; // = 1000/sample_time
 //	double rate = 100;
 
 	uint16_t duty_cycle1 = 0; // for motor left
 	uint16_t duty_cycle2 = 0; // for motor right duty + 140 = duty 1 (v1 = v2)
 
-	double sampling_interval = 10e-2;
+	double sampling_interval = 10e-5 ;
 
 	//Vehicle parameters
-	double I = 0.0315;
+    double I = 0.0315;
 	double r = 0.0325;
 	double R = 0.091;
-	double d = 0.04;
-	double m = 0.95;
+	double d = 0.037;
+	double m = 0.927;
 
 	//Motor parameters
 	double k_phi = 9.76e-3;
 	double R_a = 4.35;
 
-
-	// Testing variable
-	double encoder_test_1 = 0;
-	double encoder_test_2 = 0;
+	double number = 0;
 
 	void pulse_modulation(uint16_t *duty_cycle1, uint16_t *duty_cycle2) {
 		__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, *duty_cycle1); // left
@@ -195,31 +192,17 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM4_Init();
-  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
-  HAL_UART_Receive(&huart2, &buffer, 8, 90000);
-
-    		theta_buffer = ((buffer[2] - 48)*100) + ((buffer[4] - 48)*10) + (buffer[5] - 48);
-    		x = buffer[0] - 48;
-    		y = buffer[1] - 48;
-    		theta = theta_buffer / 100;
-    		x_r = buffer[6] - 48;
-    		y_r = buffer[7] - 48;
-
 
   // Motor left
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
-  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_1 | TIM_CHANNEL_2);
+  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_2 | TIM_CHANNEL_1);
   // Motor right
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
   HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_1 | TIM_CHANNEL_2);
 
-  // setting rotation direction for motor
-  HAL_GPIO_WritePin(IN1_GPIO_Port, IN1_Pin, 0);
-  HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, 1);
-  HAL_GPIO_WritePin(IN3_GPIO_Port, IN3_Pin, 1);
-  HAL_GPIO_WritePin(IN4_GPIO_Port, IN4_Pin, 0);
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -227,9 +210,34 @@ int main(void)
   	  present_time = HAL_GetTick();
   while (1)
   {
-	  encoder_cnt1 = __HAL_TIM_GET_COUNTER(&htim1);
+	  double t, h;
+	  encoder_cnt1 = 0;//__HAL_TIM_GET_COUNTER(&htim1);
 	  encoder_cnt2 = __HAL_TIM_GET_COUNTER(&htim2);
 
+	  if(number == 0)
+	  {
+		  number += 1;
+		  encoder2_previous = 0;
+	  }
+	  else if(number == 1)
+			  	{
+			  		encoder2_previous = 62000;
+			  		number += 1;
+			  		t = encoder_cnt2;
+			  	}
+	  else if(number == 2)
+			  	{
+		  		encoder1_previous = 0;//encoder_cnt1;
+		  		encoder2_previous = t;
+		  		h = encoder_cnt2;
+		  		number += 1;
+			  	}
+
+	  else
+	  	{
+	  		encoder2_previous = h;
+	  		h = encoder_cnt2;
+	  	}
 
 
 	  if(HAL_GetTick() - present_time > sample_time) {
@@ -241,17 +249,14 @@ int main(void)
 		  	}
 
 		  	if(encoder_cnt2 - encoder2_previous < 0) {
-		  		right_angular_velocity = ((encoder_cnt2 - encoder2_previous + 65535) / 1320) * rate;
+		  		right_angular_velocity = ((encoder_cnt1 - encoder1_previous + 65535) / 1320) * rate;
 		  	}
 		  	else {
 		  		right_angular_velocity = ((encoder_cnt2 - encoder2_previous) / 1320) * rate;
 		  	}
 
 		  	encoder_test_1 = encoder_cnt1 - encoder1_previous;
-		  	encoder_test_2 = encoder_cnt2 - encoder2_previous;
-	  		encoder1_previous = encoder_cnt1;
-	  		encoder2_previous = encoder_cnt2;
-
+			encoder_test_2 = encoder_cnt2 - encoder2_previous;
 
 	  		velocity(&v, left_angular_velocity, right_angular_velocity);
 	  		error(x, y, theta, x_r, y_r, theta_r, &e_x, &e_y, &e_theta);
@@ -477,39 +482,6 @@ static void MX_TIM4_Init(void)
 }
 
 /**
-  * @brief USART2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART2_UART_Init(void)
-{
-
-  /* USER CODE BEGIN USART2_Init 0 */
-
-  /* USER CODE END USART2_Init 0 */
-
-  /* USER CODE BEGIN USART2_Init 1 */
-
-  /* USER CODE END USART2_Init 1 */
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 115200;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART2_Init 2 */
-
-  /* USER CODE END USART2_Init 2 */
-
-}
-
-/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -525,21 +497,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, IN4_Pin|IN3_Pin|IN1_Pin|IN2_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : IN4_Pin */
-  GPIO_InitStruct.Pin = IN4_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(IN4_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : IN3_Pin IN1_Pin IN2_Pin */
-  GPIO_InitStruct.Pin = IN3_Pin|IN1_Pin|IN2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  /*Configure GPIO pins : CFG0_Pin CFG1_Pin CFG2_Pin */
+  GPIO_InitStruct.Pin = CFG0_Pin|CFG1_Pin|CFG2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */

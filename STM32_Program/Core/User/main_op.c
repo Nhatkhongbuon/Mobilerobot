@@ -3,6 +3,7 @@
 // Robot parameters
 extern double sampling_interval;
 extern double m, d, I, r, R;
+extern double t1, t2;
 
 /*
 (Global variable)
@@ -127,8 +128,11 @@ mutiplication(&inv_B, &M_u, &torque);
 deallocate_matrix(&inv_B);
 deallocate_matrix(&M_u);
 
+
 tau->index[0][0] = torque.index[0][0];
 tau->index[1][0] = torque.index[1][0];
+t1 = torque.index[0][0];
+t2 = torque.index[1][0];
 
 deallocate_matrix(&torque);
 }
@@ -140,9 +144,23 @@ void velocity(matrix *v, double left_angular_velocity, double right_angular_velo
     v->index[1][0] = r / (2 * R) * (right_angular_velocity - left_angular_velocity);
 }
 
-// Calculate voltage for the motor
+ //Calculate voltage for the motor
 void voltage(double *voltage_left, double *voltage_right, double left_angular_velocity, double right_angular_velocity, matrix *tau)
 {
+
     *voltage_left = k_phi * left_angular_velocity * 30 + R_a * tau->index[1][0] / k_phi;
     *voltage_right = k_phi * right_angular_velocity * 30 + R_a * tau->index[0][0] / k_phi;
 }
+
+//void voltage(double *voltage_left, double *voltage_right, double left_angular_velocity, double right_angular_velocity, matrix *tau)
+//{
+//    *voltage_left =  R_a * tau->index[1][0] / k_phi;
+//    *voltage_right =  R_a * tau->index[0][0] / k_phi;
+//}
+
+//void voltage(double *voltage_left, double *voltage_right, double left_angular_velocity, double right_angular_velocity, matrix *tau)
+//{
+//    *voltage_left = k_phi * left_angular_velocity * 30 + 1;
+//    *voltage_right = k_phi * right_angular_velocity * 30 + 1;
+//}
+
