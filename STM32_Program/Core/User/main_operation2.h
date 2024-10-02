@@ -5,6 +5,8 @@
 #include "matrices_op2.h"
 
 //Main program function
+
+void desired_trajectory(double *v_r, double *w_r, double x_r, double y_r);
 void velocity(matrix *v, double left_angular_velocity, double right_angular_velocity);
 void error(double x, double y, double theta, double x_r, double y_r, double theta_r, double *e_x, double *e_y, double *e_theta);
 void virtual_control(matrix *v_c, matrix *K, matrix *v_c_old, double e_x, double e_y, double e_theta, double v_r, double w_r);

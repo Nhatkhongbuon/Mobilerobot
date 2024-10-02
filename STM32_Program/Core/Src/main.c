@@ -74,8 +74,8 @@ static void MX_TIM4_Init(void);
 	double x_r = 0;
 	double y_r = 0;
 	double theta_r = 0;
-	double v_r = 1;
-	double w_r = 1;
+	double v_r = 0.2;
+	double w_r = 0.2;
 
 	double e_x;
 	double e_y;
@@ -97,14 +97,14 @@ static void MX_TIM4_Init(void);
 	volatile double encoder2_previous = 0;
 
 	double present_time = 0;
-	double sample_time = 1000;
-	double rate = 1 * 6.28; // = 1000/sample_time
+	double sample_time = 100;
+	double rate = 10 * 6.28; // = 1000/sample_time
 //	double rate = 100;
 
 	uint16_t duty_cycle1 = 0; // for motor left
 	uint16_t duty_cycle2 = 0; // for motor right duty + 140 = duty 1 (v1 = v2)
 
-	double sampling_interval = 10e-5 ;
+	double sampling_interval = 10e-10 ;
 
 	//Vehicle parameters
     double I = 0.0315;
@@ -112,6 +112,8 @@ static void MX_TIM4_Init(void);
 	double R = 0.091;
 	double d = 0.037;
 	double m = 0.927;
+
+
 
 	//Motor parameters
 	double k_phi = 9.76e-3;
@@ -202,7 +204,6 @@ int main(void)
   HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_1 | TIM_CHANNEL_2);
 
 
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -210,35 +211,10 @@ int main(void)
   	  present_time = HAL_GetTick();
   while (1)
   {
-	  double t, h;
-	  encoder_cnt1 = 0;//__HAL_TIM_GET_COUNTER(&htim1);
+	  encoder_cnt1 = __HAL_TIM_GET_COUNTER(&htim1);
+	  double a = encoder_cnt1;
 	  encoder_cnt2 = __HAL_TIM_GET_COUNTER(&htim2);
-
-	  if(number == 0)
-	  {
-		  number += 1;
-		  encoder2_previous = 0;
-	  }
-	  else if(number == 1)
-			  	{
-			  		encoder2_previous = 62000;
-			  		number += 1;
-			  		t = encoder_cnt2;
-			  	}
-	  else if(number == 2)
-			  	{
-		  		encoder1_previous = 0;//encoder_cnt1;
-		  		encoder2_previous = t;
-		  		h = encoder_cnt2;
-		  		number += 1;
-			  	}
-
-	  else
-	  	{
-	  		encoder2_previous = h;
-	  		h = encoder_cnt2;
-	  	}
-
+	  double b = encoder_cnt2;
 
 	  if(HAL_GetTick() - present_time > sample_time) {
 		  	if(encoder_cnt1 - encoder1_previous < 0) {
@@ -256,7 +232,9 @@ int main(void)
 		  	}
 
 		  	encoder_test_1 = encoder_cnt1 - encoder1_previous;
-			encoder_test_2 = encoder_cnt2 - encoder2_previous;
+		  	encoder_test_2 = encoder_cnt2 - encoder2_previous;
+		  	encoder1_previous = encoder_cnt1;
+		  	encoder2_previous = encoder_cnt2;
 
 	  		velocity(&v, left_angular_velocity, right_angular_velocity);
 	  		error(x, y, theta, x_r, y_r, theta_r, &e_x, &e_y, &e_theta);

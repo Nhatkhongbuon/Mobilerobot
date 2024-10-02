@@ -1,7 +1,8 @@
-../Core/User/main_op.c:30:6:error	1
-../Core/User/main_op.c:39:6:virtual_control	1
-../Core/User/main_op.c:52:6:control_signal	1
-../Core/User/main_op.c:69:6:next_state	1
-../Core/User/main_op.c:92:6:torque	1
-../Core/User/main_op.c:141:6:velocity	1
-../Core/User/main_op.c:148:6:voltage	1
+../Core/User/main_op.c:30:6:desired_trajectory	1
+../Core/User/main_op.c:64:6:error	1
+../Core/User/main_op.c:73:6:virtual_control	1
+../Core/User/main_op.c:86:6:control_signal	1
+../Core/User/main_op.c:103:6:next_state	1
+../Core/User/main_op.c:126:6:torque	1
+../Core/User/main_op.c:176:6:velocity	1
+../Core/User/main_op.c:183:6:voltage	1

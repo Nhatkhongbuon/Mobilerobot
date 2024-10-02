@@ -4,7 +4,7 @@
 extern double sampling_interval;
 extern double m, d, I, r, R;
 extern double t1, t2;
-
+extern double a, eta, alpha;
 /*
 (Global variable)
 double sampling_interval;
@@ -26,6 +26,40 @@ matrix tau;
 // Motor parameter
 extern double k_phi;
 extern double R_a;
+
+void desired_trajectory(double *v_r, double *w_r, double x_r, double y_r)
+{
+    static int count = 0;
+    double time = count * sampling_interval;
+    count += 1;
+
+    // đạo hàm bậc 1
+    double derivative_x_r = a * (- eta * alpha / 2 * (sin((eta + 1) * alpha * time) + sin((eta - 1) * alpha * time)) - alpha * (y_r) / a);
+    double derivative_y_r = a * (- eta * alpha / 2 * (- cos((eta + 1) * alpha * time) + cos((eta - 1) * alpha * time)) + alpha * (x_r) / a);
+
+    // đạo hàm bậc 2
+    double derivative_x_r_2nd = a * (- eta * alpha / 2 * (alpha * (eta + 1) * cos((eta + 1) * alpha * time) + alpha * (eta - 1) * cos((eta - 1) * alpha * time)) - alpha * derivative_y_r / a);
+    double derivative_y_r_2nd = a * (- eta * alpha / 2 * (alpha * (eta + 1) * sin((eta + 1) * alpha * time) - alpha * (eta - 1) * sin((eta - 1) * alpha * time)) + alpha * derivative_x_r / a);
+
+    // đạo hàm bậc 3
+    double derivative_x_r_3nd = a * (- eta * alpha / 2 * (- pow(((eta + 1) * alpha), 2) * sin((eta + 1) * alpha * time) - pow(((eta - 1) * alpha) , 2) * sin((eta - 1) * alpha * time)) - alpha * derivative_y_r_2nd / a);
+    double derivative_y_r_3nd = a * (- eta * alpha / 2 * (pow(((eta + 1) * alpha) , 2) * cos((eta + 1) * alpha * time) - pow(((eta - 1) * alpha) , 2) * cos((eta - 1) * alpha * time)) + alpha * derivative_x_r_2nd / a);
+
+    // tính toán vận tốc
+    *v_r = sqrt(pow(derivative_x_r , 2) + pow(derivative_y_r , 2));
+
+    // đạo hàm cấp 1,2 của v_r
+    double derivative_v_r = (derivative_x_r * derivative_x_r_2nd + derivative_y_r * derivative_y_r_2nd) / sqrt(pow(derivative_x_r , 2) + pow(derivative_y_r , 2));
+    double derivative_v_r_2nd = (pow(derivative_x_r_2nd , 2) + derivative_x_r * derivative_x_r_3nd + pow(derivative_y_r_2nd , 2) + derivative_y_r * derivative_y_r_3nd) / *v_r  - pow(derivative_v_r , 2) / *v_r;
+
+    *w_r = (d * (derivative_x_r * derivative_v_r_2nd - derivative_x_r_3nd * *v_r) * pow(*v_r , 2) * derivative_y_r
+    - d * (derivative_v_r * derivative_x_r - derivative_x_r_2nd * *v_r) * (2 * *v_r * derivative_v_r * derivative_y_r + derivative_y_r_2nd * pow(*v_r , 2)))
+    / (pow(*v_r , 4) * pow(derivative_y_r , 2) + pow(d , 2) * ((derivative_x_r * derivative_v_r - derivative_x_r_2nd * pow(*v_r , 2))
+    + (derivative_x_r * derivative_v_r - derivative_x_r_2nd * *v_r) / (*v_r * derivative_y_r)));
+}
+
+
+
 
 void error(double x, double y, double theta, double x_r, double y_r, double theta_r, double *e_x, double *e_y, double *e_theta)
 {
@@ -131,6 +165,7 @@ deallocate_matrix(&M_u);
 
 tau->index[0][0] = torque.index[0][0];
 tau->index[1][0] = torque.index[1][0];
+
 t1 = torque.index[0][0];
 t2 = torque.index[1][0];
 
